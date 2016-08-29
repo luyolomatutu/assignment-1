@@ -1,8 +1,12 @@
 ---
-title: "Assignment 1"
+title: "Assignment 1-6"
 author: Luyolo Matutu
 output: github_document
 ---
+## Assignment 1
+## Hello Octocat
+I love Octocat. She's the coolest cat in town. 
+![](https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/images/octocat.png)
 
 ```{r setup, include=FALSE, fig.path='./figures/', fig.height= 8, fig.width= 8, fig.align='center'}
 
@@ -30,3 +34,171 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Assignment 2
+```{r quick_look, echo=TRUE}
+# R dataset
+data("anscombe")
+dim(anscombe)
+names(anscombe)
+head(anscombe, n=6)
+tail(anscombe, n=6)
+summary(anscombe)
+
+```
+## Assignment 3
+```{r xy_plot, echo=FALSE, fig.path='./figures/', fig.height= 8, fig.width= 8, fig.align='center',fig.ext='svg'}
+
+# R dataset
+data("anscombe")
+ # plotting of scatter plot
+plot(x=anscombe$x1, y=anscombe$y1)
+abline(lm(y1 ~ x1, data = anscombe))
+
+```
+
+## Assignment 4
+# Chunk 4
+```{r data_import, echo=TRUE}
+# packages to read data for all chunks
+library(readr)
+library(dplyr)
+library(tidyr)
+
+#read data from analgesic.csv file
+df<-read.csv("analgesic (1).csv")
+```
+# Chunk 5
+```{r data_summary, echo=FALSE}
+
+#contents of 'df'
+dim(df)
+names(df)
+head(df, n=6)
+tail(df, n=6)
+summary(df)
+```
+# Chunk 6
+```{r data_tidy, echo=TRUE}
+# tidy data
+df_1 <- gather(df, key = Measurements, value = value, Measurement_1, Measurement_2, Measurement_3, -ID)
+df_2 <- group_by(df_1, ID, Group)
+summarise(df_2, mean = mean(value))
+```
+## Assignment 5
+# Chunk 1- Chicken Weights
+* null hypothesis: growth rate of chickens do not depend on different feed supplements
+* alternative hypothesis: growth rate of chickens depends on different feed supplements
+```{r echo=TRUE}
+# read data
+x <- read.csv("file:///C:/Users/Wits-User/Desktop/stats revision/chick-weights (1).csv")
+
+#tidy data
+boxplot(x$weight ~ x$feed)
+
+#statistical test
+chickanova <- aov(weight ~ feed, data = x)
+summary (chickanova)
+```
+
+## assumption that underlie the test
+* use ANOVA when grouping factor is more than 3 groups
+* assume normal distribution of data
+* statistical test= one way ANOVA, DF= 5, p value< 0.05
+
+## interpretation of the outcomes
+* p is less that 0.05 therefore reject the null hypothesis.
+
+#Chunk 2- The Hot Zone
+* null hypothesis: outbreak of severe gastroenteritis is not caused by contamination of drinking water
+* alternative alternative: outbreak of severe gastroenteritis is caused by contamination of drinking water
+```{r echo=TRUE}
+# read outbreak of gastroenteritis
+x <- read.csv("file:///C:/Users/Wits-User/Desktop/stats revision/gastroenteritis (2).csv")
+y <- xtabs(~Consumption + Outcome, data = x)
+head(x)
+table(x$Consumption, x$Outcome)
+
+#plot data
+barplot(y, beside = TRUE, ylab = 'water consumption', xlab= 'clinical presentation', main = 'investigation of gastroenteritis outcome', col= c("pink", "purple", "turquoise"))
+
+legend('top', c("<1 glasses/day", ">4 glasses/day", "1 to 4 glasses/day"), fill = c("red", "orange", "yellow"))
+
+#statistical test
+z <- chisq.test(y, correct = TRUE)
+z
+```
+## assumption that underlie the test
+* three categorical variables from the same population
+* trying to see if there is an association between the variables
+
+## interpretation of the outcomes
+* p value < 0.05, DF = 2
+* p value is less than 0.05 therefore reject the null hypothesis
+
+#Chunk 3- Nausea
+* null hypothesis: ingestion of 5HT3-receptor blocker causes nausea
+* alternative hypothesis: ingestion of 5HT3-receptor blocker does not cause nausea
+```{r echo=TRUE}
+#read nausea data
+x <- read.csv("file:///C:/Users/Wits-User/Desktop/stats revision/nausea (1).csv")
+
+#tidy the data
+# changed the 40 from row 8, column 3 to 4, b/c I think it might be a typo, seeing that the scale goes from 0-6.
+
+x[8,3]= 4
+x
+
+# plotting data 
+plot(x$Nausea_before ~ x$Patient, type = "l", ylim = c(0,6), xlab = 'patient', ylab = 'nausea score', col = 'purple', main = 'rating of nausea before and after receiving chemotherapy')
+lines(x$Nausea_after, col = 'pink')
+legend("center", c("Nausea_before", "Nausea_after"), fill = c("purple", "pink"))
+
+#statistical test
+wilcox.test(x$Nausea_before,x$Nausea_after, paired = TRUE)
+```
+## assumptions that underlie the test
+*  the data is non-parametric
+* two measurements taken from the same individual
+
+## interpretation of the outcome
+* p< 0.05, therefore reject null hypothesis and accept alternative hypothesis
+
+# Housing Prices
+## null hypothesis
+* the price of housing is not dependent on the interest rate
+
+## alternative hypothesis
+* the price of housing is dependent on the interest rate 
+```{r echo=TRUE}
+#read housing prices
+x <- read.csv("file:///C:/Users/Wits-User/Desktop/stats revision/housing-prices (1).csv")
+
+#data plot
+plot (x$interest_rate,x$median_house_price_USD, main = 'The effect of interest rate house price', xlab = "interest rate", ylab = "median house price", pch = 19, col = "pink", fill = c("pink"))
+
+abline(lm(x$median_house_price_USD~x$interest_rate, data = x), lwd = 3, col = "purple" )
+
+
+#linear regression
+x1 <- lm(x$median_house_price_USD~x$interest_rate, data = x)
+summary (x1)
+
+# diagnostic 1: homoskedasticity
+plot(x= x1$fitted.values, y=x1$residuals, xlab = "fitted values", ylab = "residuals", pch = 19, col = "pink", main = "Homoskedasticity")
+abline(h=0, lwd = 3, col = "turquoise")
+
+# diagnostic 2: gaussian residual distribution
+qqnorm(x1$residuals, pch = 19, col = "pink")
+qqline(x1$residuals, lwd = 3, col = "grey")
+
+#plot generalized linear model
+glm(x$median_house_price_USD~x$interest_rate, data = x)
+
+```
+
+## assumptions that underlie the analysis
+* The reason behind plotting a generalized linear model is because the residuals are not normally distributed. Diagnostic 1 presents with residuals that show a shape, not random distribution. secondly, the residuals do not have the same variance. Diagnostic 2 presents with residuals that are not fitted on along the plot.
+
+## interpretation of outcomes
+p= 0.01937, therefore p< 0.05 so reject the null hypothesis and accept the alternative hypothesis
+df= 15
